@@ -28,7 +28,7 @@ const (
 
 func aesKeyLen(strength byte) int {
 	switch strength {
-	case 1:
+	case 0, 1:
 		return aes128
 	case 2:
 		return aes192
