@@ -15,6 +15,7 @@ import (
 	"errors"
 	"hash"
 	"io"
+	"os"
 
 	"golang.org/x/crypto/pbkdf2"
 )
@@ -457,6 +458,23 @@ func (w *Writer) Encrypt(name string, password string) (io.Writer, error) {
 		Name:   name,
 		Method: Deflate,
 	}
+	fh.SetPassword(password)
+	return w.CreateHeader(fh)
+}
+
+// EncryptWithFileInfoHeader adds a file to the zip file using the provided name.
+// It returns a Writer to which the file contents should be written. File
+// contents will be encrypted with AES-256 using the given password. The
+// file's contents must be written to the io.Writer before the next call
+// to Create, CreateHeader, or Close.
+func (w *Writer) EncryptWithFileInfoHeader(name string, fi os.FileInfo, password string) (io.Writer, error) {
+	fh, _ := FileInfoHeader(fi)
+	fh.Name = name
+	fh.Method = Deflate
+	// fh := &FileHeader{
+	// 	Name:   name,
+	// 	Method: Deflate,
+	// }
 	fh.SetPassword(password)
 	return w.CreateHeader(fh)
 }
